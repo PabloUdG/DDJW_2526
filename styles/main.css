@@ -14,3 +14,13 @@ button.center{
 	color:red;
 	text-align: center;
 }
+
+body{
+	background-color: aquamarine;
+}
+
+button{
+	background-color: blueviolet;
+	border: 4px dotted purple;
+	border-radius: 25px;
+}
