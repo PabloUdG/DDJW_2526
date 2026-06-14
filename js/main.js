@@ -2,7 +2,7 @@ addEventListener('load', function() {
     document.getElementById('play').addEventListener('click', 
     function(){
         sessionStorage.removeItem('load');
-        window.location.assign("./html/game.html");
+        window.location.assign("./html/canvasgame.html");
     });
 
     document.getElementById('options').addEventListener('click', 
@@ -33,7 +33,8 @@ addEventListener('load', function() {
         window.location.assign("./html/game.html");
     });
 
-    exit.on('click', function(){
-        console.warn("No es pot sortir!");
+    document.getElementById('exit').addEventListener('click',
+        function(){
+            window.close();
     });
 });
