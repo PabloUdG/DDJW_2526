@@ -3,10 +3,12 @@ import {$} from "../library/jquery-4.0.0.slim.module.min.js";
 var options = function(){
     const default_options = {
         pairs: 2,
+        groupSize: 2,
         difficulty: 'normal'
     } 
 
     var pairs = $('#pairs');
+    var groupSize = $('#group');
     var difficulty = $('#dif');
     
     var savedOptions = localStorage.options && JSON.parse(localStorage.options);
@@ -18,6 +20,7 @@ var options = function(){
         options.difficulty = savedOptions.difficulty;
 
     pairs.val(options.pairs);
+    groupSize.val(options.groupSize)
     difficulty.val(options.difficulty);
 
     pairs.on('change', function (){
@@ -28,6 +31,9 @@ var options = function(){
         options.difficulty = difficulty.val();
     });
 
+    groupSize.on('change', function (){
+        options.groupSize = groupSize.val();
+    });
     return {
         applyChanges: function(){
             localStorage.options = JSON.stringify(options);
@@ -36,6 +42,7 @@ var options = function(){
             options.pairs = default_options.pairs;
             options.difficulty = default_options.difficulty;
             pairs.val(options.pairs);
+            groupSize.val(options.groupSize);
             difficulty.val(options.difficulty);
         }
     }

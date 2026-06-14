@@ -1,7 +1,8 @@
-const resources = ['../resources/cb.png', '../resources/co.png',
-                '../resources/sb.png', '../resources/so.png',
-                '../resources/tb.png', '../resources/to.png'];
-const back = '../resources/back.png';
+const resources = ['../resources/cn.svg', '../resources/cv.svg',
+                '../resources/dn.svg', '../resources/dv.svg',
+                '../resources/pn.svg', '../resources/pv.svg',
+                '../resources/tn.svg', '../resources/tv.svg'];
+const back = '../resources/back.svg';
 
 const StateCard = Object.freeze({
   DISABLE: 0,
@@ -9,14 +10,19 @@ const StateCard = Object.freeze({
   DONE: 2
 });
 
+var options = JSON.parse(localStorage.options);
+
+
 var game = {
     items: [],
     states: [],
     setValue: null,
     ready: 0,
-    lastCard: null,
+    previousCards: [],
     score: 200,
-    pairs: 2,
+    pairs: options.pairs,
+    group: options.groupSize,
+    difficulty: options.difficulty,
     goBack: function(idx){
         this.setValue && this.setValue[idx](back);
         this.states[idx] = StateCard.ENABLE;
@@ -30,15 +36,19 @@ var game = {
             let toLoad = JSON.parse(sessionStorage.load);
             this.items = toLoad.items;
             this.states = toLoad.states;
-            this.lastCard = toLoad.lastCard;
+            this.previousCards = toLoad.previousCards;
             this.score = toLoad.score;
             this.pairs = toLoad.pairs;
+            this.group = toLoad.group;
+            this.difficulty = toLoad.difficulty;
         }
         else{ // Nova partida
             this.items = resources.slice();          
             shuffe(this.items);                      
-            this.items = this.items.slice(0, this.pairs); 
-            this.items = this.items.concat(this.items);        
+            this.items = this.items.slice(0, this.pairs);
+            for (let index = 0; index < this.group-1; index++) { //-1 per les cartes que ja estan inicialment en el array
+                this.items = this.items.concat(this.items);        
+            }
             shuffe(this.items);
             this.states = new Array(this.items.length);
         }
@@ -53,18 +63,27 @@ var game = {
                 setTimeout(()=>{
                     this.ready++;
                     this.goBack(indx);
-                }, 1000 + 100 * indx);
+                }, 1000 + 100 * indx + 50 * this.group);
             }
         });
     },
     click: function(indx){
         if (this.states[indx] !== StateCard.ENABLE || this.ready < this.items.length) return;
         this.goFront(indx);
-        if (this.lastCard === null) this.lastCard = indx; // Primera carta clicada
-        else{ // Teníem carta prèvia
-            if (this.items[this.lastCard] === this.items[indx]){
+        if (this.previousCards.length === 0) this.previousCards.push(indx); // Primera carta clicada
+        else if(this.previousCards.length < this.group){ 
+            if (this.items[this.previousCards[this.previousCards.length-1]] === this.items[indx]){
+                this.previousCards.push(indx)
+            }else{
+                this.goBack(indx);
+                this.previousCards.forEach((element) => { this.goBack(element) });
+                this.previousCards = [];
+            }
+        }else{ // Teníem carta prèvia
+            if (this.items[this.previousCards[this.previousCards.length-1]] === this.items[indx]){
                 this.pairs--;
-                this.states[this.lastCard] = this.states[indx] = StateCard.DONE;
+                this.states[indx] = StateCard.DONE;
+                this.previousCards.forEach((element) => { this.states[element] = StateCard.DONE });
                 if (this.pairs <= 0){
                     alert(`Has guanyat amb ${this.score} punts!!!!`);
                     window.location.assign("../");
@@ -72,23 +91,25 @@ var game = {
             }
             else {
                 this.goBack(indx);
-                this.goBack(this.lastCard);
+                this.previousCards.forEach((element) => { this.goBack(element) });
                 this.score -= 25;
                 if (this.score <= 0){
                     alert ("Has perdut");
                     window.location.assign("../");
                 }
             }
-            this.lastCard = null;
+            this.previousCards = [];
         }
     },
     save: function(){
         let to_save = JSON.stringify({
             items: this.items,
             states: this.states,
-            lastCard: this.lastCard,
+            previousCards: this.previousCards,
             score: this.score,
-            pairs: this.pairs
+            pairs: this.pairs,
+            group: this.group,
+            difficulty: this.difficulty
         });
         let ret = false;
         fetch('../php/save.php', {
