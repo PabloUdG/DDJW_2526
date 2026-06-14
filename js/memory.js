@@ -77,6 +77,7 @@ var game = {
             }else{
                 this.goBack(indx);
                 this.previousCards.forEach((element) => { this.goBack(element) });
+                this.score -= 25;
                 this.previousCards = [];
             }
         }else{ // Teníem carta prèvia
