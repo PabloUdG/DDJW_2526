@@ -4,7 +4,8 @@ var options = function(){
     const default_options = {
         pairs: 2,
         groupSize: 2,
-        difficulty: 'normal'
+        difficulty: 'normal',
+        gamemode: ""
     } 
 
     var pairs = $('#pairs');
@@ -40,7 +41,9 @@ var options = function(){
         },
         defaultValues: function(){
             options.pairs = default_options.pairs;
+            options.groupSize = default_options.groupSize;
             options.difficulty = default_options.difficulty;
+            options.gamemode = default_options.gamemode;
             pairs.val(options.pairs);
             groupSize.val(options.groupSize);
             difficulty.val(options.difficulty);

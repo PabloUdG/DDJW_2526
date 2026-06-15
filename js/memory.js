@@ -10,7 +10,8 @@ const StateCard = Object.freeze({
   DONE: 2
 });
 
-var options = JSON.parse(localStorage.options);
+let options = JSON.parse(localStorage.options);
+console.log(options);
 
 
 var game = {
@@ -19,10 +20,10 @@ var game = {
     setValue: null,
     ready: 0,
     previousCards: [],
-    score: 200,
-    pairs: options.pairs,
-    group: options.groupSize,
-    difficulty: options.difficulty,
+    score: getInitialScore(),
+    pairs: getPairs(),
+    group: getGroupSize(),
+    level: 0, //Aquest atribut és exclusiu per el mode infinit
     goBack: function(idx){
         this.setValue && this.setValue[idx](back);
         this.states[idx] = StateCard.ENABLE;
@@ -60,10 +61,11 @@ var game = {
                 this.ready++;
             }
             else{
+                var temps = getTempsInicial();
                 setTimeout(()=>{
                     this.ready++;
                     this.goBack(indx);
-                }, 1000 + 100 * indx + 50 * this.group);
+                }, temps);
             }
         });
     },
@@ -77,7 +79,7 @@ var game = {
             }else{
                 this.goBack(indx);
                 this.previousCards.forEach((element) => { this.goBack(element) });
-                this.score -= 25;
+                this.score -= getPenalitzacio();
                 this.previousCards = [];
             }
         }else{ // Teníem carta prèvia
@@ -93,7 +95,7 @@ var game = {
             else {
                 this.goBack(indx);
                 this.previousCards.forEach((element) => { this.goBack(element) });
-                this.score -= 25;
+                this.score -= getPenalitzacio();
                 if (this.score <= 0){
                     alert ("Has perdut");
                     window.location.assign("../");
@@ -131,6 +133,138 @@ var game = {
 
 function shuffe(arr){
     arr.sort(function () {return Math.random() - 0.5});
+}
+
+// Falta mode infinit
+function getPairs(){
+    if(options.gamemode == 'estandar'){
+        var rng = Math.random();
+        switch (options.difficulty) {
+            case 'easy':
+                return options.pairs;
+                break;
+        
+            case 'normal':
+                if(rng >= 0.75) return options.pairs + 1;
+                return options.pairs;
+                break;
+        
+            case 'hard':
+                if(rng >= 0.8) return options.pairs + 2;
+                else if(rng >= 0.5) return options.pairs + 1;
+                return options.pairs;
+                break;
+        
+            default:
+                console.log("error: dificultat no existent");
+                break;
+        }
+    }else{
+        
+    }
+}
+
+// Falta mode infinit
+function getGroupSize(){
+    if(options.gamemode == 'estandar'){
+        var rng = Math.random();
+        switch (options.difficulty) {
+            case 'easy':
+                return options.groupSize;
+                break;
+        
+            case 'normal':
+                if(rng <= 0.3) return options.groupSize + 1;
+                return options.groupSize;
+                break;
+        
+            case 'hard':
+                if(rng <= 0.4) return options.groupSize + 2;
+                else if(rng >= 0.6) return options.groupSize + 1;
+                return options.groupSize;
+                break;
+        
+            default:
+                console.log("error: dificultat no existent");
+                break;
+        }
+    }else{
+
+    }
+}
+
+// Falta mode infinit
+function getPenalitzacio(){
+    if(options.gamemode == 'estandar'){
+        switch (options.difficulty) {
+            case 'easy':
+                return 10;
+                break;
+        
+            case 'normal':
+                return 25;
+                break;
+        
+            case 'hard':
+                return 50;
+                break;
+        
+            default:
+                console.log("error: dificultat no existent");
+                break;
+        }
+    }else{
+        
+    }
+}
+
+// Falta mode infinit
+function getTempsInicial(){
+    if(options.gamemode == 'estandar'){
+        switch (options.difficulty) {
+            case 'easy':
+                return 2000 + 500 * game.pairs + 200 * game.group;
+                break;
+        
+            case 'normal':
+                return 1000 + 200 * game.pairs + 100 * game.group;
+                break;
+        
+            case 'hard':
+                return 1000 + 100 * game.pairs;
+                break;
+        
+            default:
+                console.log("error: dificultat no existent");
+                break;
+        }
+    }else{
+        
+    }
+}
+
+function getInitialScore(){
+    if(options.gamemode == 'estandar'){
+        switch (options.difficulty) {
+            case 'easy':
+                return 500;
+                break;
+        
+            case 'normal':
+                return 200;
+                break;
+        
+            case 'hard':
+                return 200;
+                break;
+        
+            default:
+                console.log("error: dificultat no existent");
+                break;
+        }
+    }else{
+        return 0;
+    }
 }
 
 export var gameItems;

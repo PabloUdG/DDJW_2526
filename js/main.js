@@ -2,7 +2,7 @@ addEventListener('load', function() {
     document.getElementById('play').addEventListener('click', 
     function(){
         sessionStorage.removeItem('load');
-        window.location.assign("./html/canvasgame.html");
+        window.location.assign("./html/gamemode.html");
     });
 
     document.getElementById('options').addEventListener('click', 
